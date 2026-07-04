@@ -8,12 +8,17 @@
 typedef union {
     uint16_t raw_value;
     struct {
-        // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
+        // TASK 1: STRUCT, UNION & BIT-FIELDS
 
-
-
-
-        // HỌC VIÊN KẾT THÚC VIẾT CODE
+        typedef union {
+            uint16_t raw_value;
+            struct {
+                uint16_t PWR_ON : 1;
+                uint16_t ASSIST_LEVEL : 2;
+                uint16_t LIGHT_BRIGHT : 4;
+                uint16_t RESERVED : 9;
+            } fields;
+        } Bike_Status_t;
     } fields;
 } Bike_Status_t;
 
@@ -30,30 +35,32 @@ void drive_sport(void) {
     printf("Bike Mode: SPORT.\n");
 }
 
-// HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
+typedef void (*Drive_Mode_t)(void);
 
-
-
-
-// HỌC VIÊN KẾT THÚC VIẾT CODE
+Drive_Mode_t drive_modes[] =
+{
+    drive_eco,
+    drive_normal,
+    drive_sport
+};
 
 
 // TASK 3: ARCHITECTURE CALLBACKS
 
 void Battery_Monitor(void (*overheat_cb)(void)) {
     int battery_temp = 45; 
-    
-    // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
 
-
-
-
-    // HỌC VIÊN KẾT THÚC VIẾT CODE
+        if (battery_temp > 40 && overheat_cb != NULL)
+        {
+            overheat_cb();
+        }
+    }
 }
 
 void Critical_Battery_Handler(void) {
     printf("[WARNING] Battery is overheated!\n");
 }
+
 
 
 // TASK 4: MEMORY MAP & CRASH LAB
@@ -62,12 +69,13 @@ const char BIKE_MODEL[] = "E-Bike X2026";
 uint32_t total_odometer = 0;             
 
 void crash_simulation(void) {
-    // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
+    // TASK 4: MEMORY MAP & CRASH LAB
 
-
-
-
-    // HỌC VIÊN KẾT THÚC VIẾT CODE
+    void crash_simulation(void) {
+        char buffer[1024];
+        (void)buffer;
+        crash_simulation();
+    }
 }
 
 
@@ -84,12 +92,17 @@ int main() {
 
     // 2. Test Task 2
     printf("ENGINE CONTROLLING: \n");
-    // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
 
+    uint8_t mode = my_bike.fields.ASSIST_LEVEL;
 
-
-
-    // HỌC VIÊN KẾT THÚC VIẾT CODE
+    if (mode < (sizeof(drive_modes) / sizeof(drive_modes[0])))
+    {
+        drive_modes[mode]();
+    }
+    else
+    {
+        printf("Invalid drive mode!\n");
+    }
 
     // 3. Test Task 3
     Battery_Monitor(Critical_Battery_Handler);

@@ -1,0 +1,25 @@
+Task 4.2:
+
+- BIKE_MODEL được lưu trong phân vùng .rodata vì đây là một hằng chuỗi (const char[]) và chỉ được đọc trong quá trình thực thi.
+- total_odometer được lưu trong phân vùng .bss vì đây là biến toàn cục được khởi tạo bằng 0. Các biến có giá trị khởi tạo bằng 0 hoặc không khởi tạo đều được đặt trong .bss.
+- current_speed được lưu trên Stack vì đây là biến cục bộ được khai báo bên trong hàm main().
+
+Task 4.3:
+Khi kích hoạt hàm crash_simulation(), chương trình sẽ thực hiện đệ quy vô hạn, liên tục tạo thêm các stack frame cho đến khi ngăn xếp bị đầy (Stack Overflow). Trên máy tính, chương trình thường kết thúc bất thường với lỗi Segmentation fault (core dumped) trên Linux/macOS hoặc Stack overflow (mã lỗi `0xC00000FD`) trên Windows (trên Visual Studio cũng hiện lỗi Stack overflow). 
+
+Nếu đoạn mã này chạy trên vi điều khiển ARM Cortex-M, hiện tượng Stack Overflow có thể làm hỏng dữ liệu trên ngăn xếp hoặc khiến CPU truy cập vùng nhớ không hợp lệ. Khi đó, bộ xử lý sẽ phát sinh ngoại lệ HardFault và nhảy vào hàm xử lý:
+
+HardFault_Handler()
+Task 5
+Chọn cách khai báo:
+
+uint16_t trip_history[20000] = {0};
+
+Mảng trip_history có kích thước khoảng 40 KB. Khi tất cả các phần tử được khởi tạo bằng 0, linker sẽ đặt mảng này vào phân vùng .bss. Dữ liệu trong .bss không được lưu trong Flash mà chỉ được cấp phát trong RAM khi chương trình khởi động, vì vậy không làm tăng dung lượng Flash sử dụng.
+
+Ngược lại, nếu khai báo:
+
+uint16_t trip_history[20000] = {1, 2, 3};
+
+Thì mảng sẽ được đặt trong phân vùng .data vì có các giá trị khởi tạo khác 0. Khi đó, Flash phải chứa một bản sao ban đầu của toàn bộ mảng (khoảng 40 KB) để chép vào RAM khi khởi động. Do vi điều khiển chỉ còn 20 KB Flash trống nên chương trình sẽ không thể biên dịch và nạp xuống chip.
+
